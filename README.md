@@ -2,7 +2,7 @@
 It listens to Twitter API to fetch tweets with keywords and saves them to BigQuery for analytics.
 
 ## Instalation  
-1. It uses: 
+1. It uses:
    a. Python3  
    b. Twitter account
    c. GoogleCloudPlatform https://cloud.google.com/bigquery/   (need a google account!)
@@ -18,7 +18,7 @@ It listens to Twitter API to fetch tweets with keywords and saves them to BigQue
 4. install requirements  
 `pip install -r requirements.txt`  
   
-5. You need to use your own credentials for access to GCP (json file project-id-bq-12345.json)  
+5. You need to use your own credentials for access to GCP (json file project-id-bq-12345.json)
 
 6. update Twitter credentials in private.py
 
@@ -59,8 +59,7 @@ optional arguments:
   --quiet     suppress all output  
   
 ```
-
-You can access to BigQuery data from Google DataStudio:
+You can access to the BigQuery data from Google DataStudio:
 
 ![Alt text](visualization.png?raw=true "Trump rules them all!")
 
