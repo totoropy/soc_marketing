@@ -15,13 +15,9 @@ def get_api():
 def listen():
     api = get_api()
     listener = PrintingListener(api)
-    try:
-        stream = tweepy.Stream(auth=api.auth, listener=listener, tweet_mode='extended')
-        print("Listening to Twitter API..   (to stop press Ctrl-C)")
-        stream.filter(track=listener.keywords)
-    except ProtocolError:
-        print("-------- Twitter ProtocolError ---------")
-        listen()
+    stream = tweepy.Stream(auth=api.auth, listener=listener, tweet_mode='extended')
+    print("Listening to Twitter API..   (to stop press Ctrl-C)")
+    stream.filter(track=listener.keywords)
 
 
 def record():
@@ -32,6 +28,8 @@ def record():
         print("Listening to Twitter API..   (to stop press Ctrl-C)")
         stream.filter(track=listener.keywords)
     except ProtocolError:
+        # This is hack to prevent stopping listening,
+        # but it set count = 0 and MAX_TWEET_COUNT will not work
         print("-------- Twitter ProtocolError ---------")
         record()
 
