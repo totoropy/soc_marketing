@@ -19,16 +19,6 @@ class MyBaseController(CementBaseController):
         description = 'TwitterTrend listens to Twitter API to fetch tweets with keywords ' \
                       'and saves them to BigQuery cloud database to do some analytics.'
 
-    @expose(help="run the daemon command.")
-    def run_forever(self):
-        from time import sleep
-
-        count = 0
-        while True:
-            count = count + 1
-            print(count)
-            sleep(10)
-
     @expose(help="Print info on screen.")
     def info(self):
         print(BANNER)

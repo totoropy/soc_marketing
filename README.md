@@ -28,6 +28,7 @@ It listens to Twitter API to fetch tweets with keywords and saves them to BigQue
 
 You should get:  
 ```
+$ python3 scraper.py -h
 usage: scraper (sub-commands ...) [options ...] {arguments ...}
 
 TwitterTrend listens to Twitter API to fetch tweets with keywords and saves them to BigQuery cloud database to do some analytics.
@@ -58,3 +59,8 @@ optional arguments:
   --quiet     suppress all output  
   
 ```
+
+You can access to BigQuery data from Google DataStudio:
+
+![Alt text](visualization.png?raw=true "Trump rules them all!")
+

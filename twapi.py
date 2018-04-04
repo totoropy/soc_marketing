@@ -1,11 +1,9 @@
 import tweepy
 from pprint import pprint
-import json
 from listeners import PrintingListener, BigQueryListener
 from google.cloud import bigquery
-import settings
-from http.client import IncompleteRead
 from urllib3.exceptions import ProtocolError
+import settings
 
 
 def get_api():

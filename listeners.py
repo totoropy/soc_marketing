@@ -1,8 +1,9 @@
-import tweepy
 from pprint import pprint
-import json
 from google.cloud import bigquery
+
+import json
 import settings
+import tweepy
 
 LEN_OF_TEXT = 30
 
