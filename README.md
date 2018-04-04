@@ -58,3 +58,7 @@ optional arguments:
   --quiet     suppress all output  
   
 ```
+You can access to the BigQuery data from Google DataStudio:
+
+![Alt text](visualization.png?raw=true "Trump rules them all!")
+
