@@ -2,7 +2,7 @@
 It listens to Twitter API to fetch tweets with keywords and saves them to BigQuery for analytics.
 
 ## Instalation  
-1. It uses:
+1. It uses:  
    a. Python3  
    b. Twitter account
    c. GoogleCloudPlatform https://cloud.google.com/bigquery/   (need a google account!)
