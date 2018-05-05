@@ -1,6 +1,5 @@
 from pprint import pprint
 from google.cloud import bigquery
-
 import json
 import settings
 import tweepy
@@ -18,9 +17,13 @@ def get_label(message):
 
 
 class PrintingListener(tweepy.StreamListener):
+    """
+    Listens Twitter API and print tweets on screen
+    """
 
     def __init__(self, api):
         self.count = 0
+        self.ticker = 0
         self.keywords = []
         for item in settings.KEYWORD_GROUPS:
             for keys in item.values():
@@ -35,7 +38,6 @@ class PrintingListener(tweepy.StreamListener):
             return False
 
     def on_status(self, status):
-        # pprint(status)
         if status.retweeted:
             return
 
@@ -65,7 +67,9 @@ class PrintingListener(tweepy.StreamListener):
 
 
 class BigQueryListener(tweepy.StreamListener):
-    """ Listen to tweets and save then in BigQuery """
+    """
+    Listens tweets and save them in BigQuery
+    """
 
     def __init__(self, api):
         self.count = 0
@@ -146,5 +150,6 @@ class BigQueryListener(tweepy.StreamListener):
         jdata = json.dumps(data)
         row = json.loads(jdata)
         errors = self.bq_client.insert_rows(self.bq_table, [row])
+
         if errors:
             pprint(errors)
