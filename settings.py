@@ -10,8 +10,8 @@ KEYWORD_GROUPS = [
     {"Politics": ["putin", "zeman", "macron", "babis"]}]
 
 MAX_TWEET_COUNT = 1000
-PROJECT_NAME = "streaming-bq-123"
-TABLE_NAME = "politika"
+PROJECT_ID = "streaming-bq-123"
+TABLE_NAME = "politika2"
 DATASET_NAME = 'twitterposts'
 
 
