@@ -34,14 +34,16 @@ def listen():
     stream.filter(track=listener.keywords)
 
 
-def record():
+def record(table_name=None):
     """ Connect to Twitter and listen tweets with BigQueryListener """
-    if check_bq_connection(settings.TABLE_NAME):
+    if not table_name:
+        table_name = settings.TABLE_NAME
+    if check_bq_connection(table_name):
         api = get_api()
         listener = BigQueryListener(api)
         try:
             stream = tweepy.Stream(auth=api.auth, listener=listener, tweet_mode='extended')
-            print("Writing into table: {}".format(settings.TABLE_NAME))
+            print("Writing into table: {}".format(table_name))
             print("Listening to Twitter API..   (to stop press Ctrl-C)")
             stream.filter(track=listener.keywords)
         except ProtocolError:
@@ -51,23 +53,27 @@ def record():
             record()
 
 
-def delete_table():
+def delete_table(table_name=None):
     """ Remove current table """
-    if check_bq_connection(settings.TABLE_NAME):
+    if not table_name:
+        table_name = settings.TABLE_NAME
+    if check_bq_connection(table_name):
         bq_client = bigquery.Client.from_service_account_json(settings.BQ_SETTING_FILE)
         bq_dataset = bq_client.dataset(settings.DATASET_NAME)
         tables = list(bq_client.list_tables(bq_dataset))  # API request(s)
-        if settings.TABLE_NAME not in [table.table_id for table in tables]:
-            print("Table '{}:{}' not found.".format(settings.DATASET_NAME, settings.TABLE_NAME))
+        if table_name not in [table.table_id for table in tables]:
+            print("Table '{}:{}' not found.".format(settings.DATASET_NAME, table_name))
         else:
             # existing table
-            table_ref = bq_dataset.table(settings.TABLE_NAME)
+            table_ref = bq_dataset.table(table_name)
             bq_client.delete_table(table_ref)  # API request
-            print("Table '{}:{}' was removed.".format(settings.DATASET_NAME, settings.TABLE_NAME))
+            print("Table '{}:{}' was removed.".format(settings.DATASET_NAME, table_name))
 
 
-def create_table():
+def create_table(table_name=None):
     # new table in big_query
+    if not table_name:
+        table_name = settings.TABLE_NAME
     bq_client = bigquery.Client.from_service_account_json(settings.BQ_SETTING_FILE)
     bq_dataset = bq_client.dataset(settings.DATASET_NAME)
     schema = [
@@ -75,10 +81,10 @@ def create_table():
         bigquery.SchemaField('keyword', 'STRING', mode='REQUIRED'),
         bigquery.SchemaField('created', 'DATETIME', mode='REQUIRED'),
     ]
-    table_ref = bq_dataset.table(settings.TABLE_NAME)
+    table_ref = bq_dataset.table(table_name)
     table = bigquery.Table(table_ref, schema=schema)
     bq_client.create_table(table)  # API request
-    print("Table '{}:{}' was created.".format(settings.DATASET_NAME, settings.TABLE_NAME))
+    print("Table '{}:{}' was created.".format(settings.DATASET_NAME, table_name))
 
 
 def list_tables():
@@ -109,11 +115,13 @@ def info():
     print("")
 
 
-def results():
+def results(table_name=None):
     """ Executes SQL statement and prints results on screen """
-    print("Results for table: {}".format(settings.TABLE_NAME))
-    if check_bq_connection(settings.TABLE_NAME):
-        source = "{}.{}.{}".format(settings.PROJECT_ID, settings.DATASET_NAME, settings.TABLE_NAME)
+    if not table_name:
+        table_name = settings.TABLE_NAME
+    print("Results for table: {}".format(table_name))
+    if check_bq_connection(table_name):
+        source = "{}.{}.{}".format(settings.PROJECT_ID, settings.DATASET_NAME, table_name)
         query = "SELECT keyword, count(keyword) AS CC FROM `{}` " \
                 "GROUP BY keyword ORDER BY keyword DESC".format(source)
         bq_client = bigquery.Client.from_service_account_json(settings.BQ_SETTING_FILE)
@@ -121,10 +129,12 @@ def results():
         return query_job.result()
 
 
-def delete_data():
+def delete_data(table_name=None):
     """ Executes SQL DELETE data in table """
-    if check_bq_connection(settings.TABLE_NAME):
-        source = "{}.{}.{}".format(settings.PROJECT_ID, settings.DATASET_NAME, settings.TABLE_NAME)
+    if not table_name:
+        table_name = settings.TABLE_NAME
+    if check_bq_connection(table_name):
+        source = "{}.{}.{}".format(settings.PROJECT_ID, settings.DATASET_NAME, table_name)
         query = "DELETE FROM `{}` WHERE true".format(source)
         bq_client = bigquery.Client.from_service_account_json(settings.BQ_SETTING_FILE)
         query_job = bq_client.query(query)
@@ -156,8 +166,8 @@ def check_bq_table(table):
 
 def check_bq_connection(table):
     """ Executes SQL statement and prints results on screen """
-    if check_bq_table(settings.TABLE_NAME):
-        source = "{}.{}.{}".format(settings.PROJECT_ID, settings.DATASET_NAME, settings.TABLE_NAME)
+    if check_bq_table(table):
+        source = "{}.{}.{}".format(settings.PROJECT_ID, settings.DATASET_NAME, table)
         query = "SELECT keyword FROM `{}` LIMIT 1".format(source)
         try:
             bq_client = bigquery.Client.from_service_account_json(settings.BQ_SETTING_FILE)

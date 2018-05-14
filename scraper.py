@@ -1,5 +1,6 @@
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
+from cement.ext.ext_argparse import ArgparseController
 from cement.core.exc import CaughtSignal
 from tests import BigQueryTest
 import settings
@@ -21,8 +22,17 @@ class MyBaseController(CementBaseController):
     """
     class Meta:
         label = 'base'
+        arguments = [
+            (['-t', '--table'],
+             dict(help='table name',)),
+        ]
         description = 'TwitterTrend listens to Twitter API to fetch tweets with keywords ' \
                       'and saves them to BigQuery cloud database to do some analytics.'
+
+    @expose(help="base controller default command", hide=True)
+    def default(self):
+        self.app.args.parse_args(['--help'])
+        print(BANNER)
 
     @expose(help="Print info on screen.")
     def info(self):
@@ -43,15 +53,21 @@ class MyBaseController(CementBaseController):
         print(BANNER)
         twapi.listen()
 
-    @expose(help="Listen to Twitter API and save results into BigQuery.")
+    @expose(
+        help="Listen to Twitter API and save results into BigQuery.",
+    )
     def record(self):
         """
         Listens to Twitter API and save data(tweets) in BigQuery
 
         :return:
         """
+        table = None
+        if self.app.pargs.table:
+            table = self.app.pargs.table
+
         print(BANNER)
-        twapi.record()
+        twapi.record(table)
 
     @expose(help="A list of tables in BigQuery.")
     def tables(self):
@@ -70,10 +86,14 @@ class MyBaseController(CementBaseController):
         :return:
         """
         print(BANNER)
-        rows = twapi.results()
-        print("Results:")
-        for row in rows:
-            print(row[0], row[1])
+        table = None
+        if self.app.pargs.table:
+            table = self.app.pargs.table
+        rows = twapi.results(table)
+        if rows:
+            print("Results:")
+            for row in rows:
+                print(row[0], row[1])
 
     @expose(help="Remove a table from BigQuery.  (A new table will be created next time.)")
     def delete(self):
@@ -82,8 +102,11 @@ class MyBaseController(CementBaseController):
         :return:
         """
         print(BANNER)
-        twapi.delete_table()
-        twapi.create_table()
+        table = None
+        if self.app.pargs.table:
+            table = self.app.pargs.table
+        twapi.delete_table(table)
+        twapi.create_table(table)
 
     @expose(help="Run tests.")
     def testcounts(self):
@@ -116,6 +139,11 @@ class MyApp(CementApp):
     class Meta:
         label = 'scraper'
         base_controller = MyBaseController
+        arguments = [
+            (['-t', '--table'],
+             dict(help='the notorious foo option', action='table')),
+        ]
+
 
 # Run the application
 with MyApp() as app:
